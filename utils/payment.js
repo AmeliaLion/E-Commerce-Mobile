@@ -5,7 +5,6 @@ export const handlePayment = async (cart, totalPrice, user) => {
   const testingMode = true;
   const pfHost = testingMode ? "sandbox.payfast.co.za" : "www.payfast.co.za";
 
-  // Use the cart parameter as needed in your payment logic
   const cartDetails = cart.map(item => `${item.Quantity} x ${item.Name}`).join(', ');
 
   const pfData = {
@@ -20,7 +19,7 @@ export const handlePayment = async (cart, totalPrice, user) => {
     m_payment_id: "1234",
     amount: totalPrice,
     item_name: "Order#123",
-    item_description: cartDetails, // Include cart details in the description
+    item_description: cartDetails,
     custom_int1: "2",
     custom_str1: "Extra order information",
     email_confirmation: "1",
@@ -32,14 +31,12 @@ export const handlePayment = async (cart, totalPrice, user) => {
   pfData["signature"] = generateSignature(pfData, myPassphrase);
 
   const dataToString = (dataArray) => {
-    // Convert your data array to a string
     let pfParamString = "";
     for (let key in dataArray) {
       if (dataArray.hasOwnProperty(key)) {
         pfParamString += `${key}=${encodeURIComponent(dataArray[key].trim()).replace(/%20/g, "+")}&`;
       }
     }
-    // Remove last ampersand
     return pfParamString.slice(0, -1);
   };
 
@@ -55,10 +52,7 @@ export const handlePayment = async (cart, totalPrice, user) => {
     return result;
   };
 
-  // Convert the data array to a string
   const pfParamString = dataToString(pfData);
-
-  // Generate payment identifier
   const identifier = await generatePaymentIdentifier(pfParamString);
 
   if (!identifier) {
@@ -66,26 +60,21 @@ export const handlePayment = async (cart, totalPrice, user) => {
     return null;
   }
 
-  // Mock IP address for validation (replace with actual IP if available)
   const mockIp = "192.168.1.1";
 
-  // Perform all checks
   const check1 = pfValidSignature(pfData, pfParamString, myPassphrase);
   const check2 = await pfValidIP(mockIp);
   const check3 = pfValidPaymentData(totalPrice, pfData);
   const check4 = await pfValidServerConfirmation(pfHost, pfParamString);
 
-  // Log the results of each check
   console.log("Check 1 (Signature Valid):", check1);
   console.log("Check 2 (IP Valid):", check2);
   console.log("Check 3 (Payment Data Valid):", check3);
   console.log("Check 4 (Server Confirmation Valid):", check4);
 
   if (check1 && check2 && check3 && check4) {
-    // All checks have passed, return the payment URL with parameters
     return `https://${pfHost}/eng/process?${pfParamString}`;
   } else {
-    // Some checks have failed, log for investigation
     console.error("Payment validation failed. Please check the payment manually.");
     return null;
   }

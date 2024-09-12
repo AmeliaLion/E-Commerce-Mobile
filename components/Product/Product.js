@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Text, View, Image, TouchableOpacity, Modal, Pressable, Alert } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
+import { Text, View, Image, TouchableOpacity, Modal } from 'react-native'; // Ensure TouchableOpacity is imported
+import { AntDesign, FontAwesome } from '@expo/vector-icons';
 import styles from './Product.styles';
 
 export default function Product({ product, onCartClick }) {
@@ -16,9 +16,14 @@ export default function Product({ product, onCartClick }) {
 
   product.Price = generatePrice(product.imdbID);
 
+  // Format price with commas and always show two decimal places
+  const formattedPrice = parseFloat(product.Price).toLocaleString('en-ZA', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+
   const handleAddToCart = () => {
     onCartClick(product);
-    Alert.alert('Success', `${product.Title} added to cart!`);
   };
 
   const imageUrl = product.Poster !== 'N/A' ? product.Poster : 'https://via.placeholder.com/300x450?text=No+Image';
@@ -26,15 +31,28 @@ export default function Product({ product, onCartClick }) {
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => setModalVisible(true)}>
-        <Image
-          style={styles.image}
-          source={{ uri: imageUrl }}
-          resizeMode="cover"
-        />
-        <View style={styles.overlay}>
-          <Text style={styles.title} numberOfLines={2}>{product.Title}</Text>
-          <Text style={styles.price}>R{product.Price}</Text>
+        <View style={styles.imageContainer}>
+          <Image
+            style={styles.image}
+            source={{ uri: imageUrl }}
+            resizeMode="cover"
+          />
+          <View style={styles.gradient}>
+            <Text style={styles.title} numberOfLines={2}>{product.Title}</Text>
+          </View>
         </View>
+        <View style={styles.infoContainer}>
+          <Text style={styles.price}>R{formattedPrice}</Text>
+          <Text style={styles.year}>{product.Year}</Text>
+        </View>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.addToCartButton}
+        onPress={handleAddToCart}
+      >
+        <AntDesign name="shoppingcart" size={20} color="white" />
+        <Text style={styles.addToCartButtonText}>Add To Cart</Text>
       </TouchableOpacity>
 
       <Modal
@@ -45,6 +63,12 @@ export default function Product({ product, onCartClick }) {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <AntDesign name="close" size={24} color="white" />
+            </TouchableOpacity>
             <Image
               style={styles.modalImage}
               source={{ uri: imageUrl }}
@@ -54,24 +78,15 @@ export default function Product({ product, onCartClick }) {
               <Text style={styles.modalTitle}>{product.Title}</Text>
               <Text style={styles.modalInfo}>Year: {product.Year}</Text>
               <Text style={styles.modalInfo}>Type: {product.Type}</Text>
-              <Text style={styles.modalPrice}>R{product.Price}</Text>
+              <Text style={styles.modalPrice}>R{formattedPrice}</Text>
             </View>
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => setModalVisible(false)}
-              >
-                <AntDesign name="close" size={20} color="white" />
-                <Text style={styles.buttonText}>Close</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.button, styles.buttonAdd]}
-                onPress={handleAddToCart}
-              >
-                <AntDesign name="shoppingcart" size={20} color="white" />
-                <Text style={styles.buttonText}>Add To Cart</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={styles.modalAddToCartButton}
+              onPress={handleAddToCart}
+            >
+              <AntDesign name="shoppingcart" size={20} color="white" />
+              <Text style={styles.buttonText}>Add To Cart</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>

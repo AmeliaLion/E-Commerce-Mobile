@@ -15,7 +15,7 @@ export default function CartItem({ product }) {
   };
 
   return (
-    <View style={styles.contener}>
+    <View style={styles.container}>
       <View style={styles.cartLine}>
         <Image
           style={styles.image}
@@ -25,12 +25,13 @@ export default function CartItem({ product }) {
         />
         <View style={styles.cartDescription}>
           <Text style={styles.title}>{product.Title}</Text>
-          <Text style={styles.price}>Price: ${product.Price}</Text>
-          <Text style={styles.quantity}>Quantity: {product.Quantity}</Text>
+          <Text style={styles.price}>Price: R {product.Price}</Text>
           <View style={styles.buttonOpacityContainer}>
             <TouchableOpacity style={styles.buttonOpacity} onPress={() => incrementCartItemQuantity(product.imdbID)}>
               <Text>+</Text>
             </TouchableOpacity>
+            {/* Moved here */}
+            <Text style={styles.quantity}>      {product.Quantity}     </Text>
             <TouchableOpacity style={styles.buttonOpacity} onPress={handleDecrement}>
               <Text>-</Text>
             </TouchableOpacity>

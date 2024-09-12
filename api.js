@@ -1,15 +1,8 @@
 import axios from "axios";
 
-
 const searchImages = async (term) => {
-
-    var list = "";
-
-    const response = await axios.get(`https://www.omdbapi.com/?s=${term}&plot=full&apikey=263d22d8`);
-
-    return response.data;
-
- 
+  const response = await axios.get(`https://www.omdbapi.com/?s=${term}&plot=full&apikey=263d22d8`);
+  return response.data;
 };
 
 // const searchImages = async (term) => {

@@ -1,14 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { TextInput, Button, Text, Title } from 'react-native-paper';
+import { TextInput, Button, Text, Title, Snackbar } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import { AuthContext } from '../../context/AuthContext';
 
-const SignIn = ({ navigation }) => {
+const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [visible, setVisible] = useState(false);
+  const [error, setError] = useState('');
+  const { login } = useContext(AuthContext);
+  const navigation = useNavigation();
 
-  const handleSignIn = () => {
-    // Implement your sign-in logic here
-    console.log('Sign in with:', email, password);
+  const handleSignin = async () => {
+    if (!email || !password) {
+      setError('All fields are required');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://192.168.0.215:5000/api/auth/login', { email, password });
+
+      if (response.data) {
+        login(response.data);
+        setVisible(true);
+        setTimeout(() => {
+          navigation.navigate('Home');
+        }, 2000);
+      } else {
+        setError('Invalid credentials');
+      }
+    } catch (error) {
+      console.error('Error during signin:', error);
+      setError('An error occurred during signin');
+    }
   };
 
   return (
@@ -29,12 +55,20 @@ const SignIn = ({ navigation }) => {
         style={styles.input}
         mode="outlined"
       />
-      <Button mode="contained" onPress={handleSignIn} style={styles.button}>
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      <Button mode="contained" onPress={handleSignin} style={styles.button}>
         Sign In
       </Button>
       <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-      <Text style={styles.link}> Don't have an account?   Sign Up</Text>
-    </TouchableOpacity>
+        <Text style={styles.link}>Don't have an account? Sign Up</Text>
+      </TouchableOpacity>
+      <Snackbar
+        visible={visible}
+        onDismiss={() => setVisible(false)}
+        duration={Snackbar.DURATION_SHORT}
+      >
+        Login Successful!
+      </Snackbar>
     </View>
   );
 };
@@ -61,6 +95,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textAlign: 'center',
     color: '#1e88e5',
+  },
+  error: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 12,
   },
 });
 

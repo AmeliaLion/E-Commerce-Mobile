@@ -1,15 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
-import { TextInput, Button, Text, Title } from 'react-native-paper';
+import { TextInput, Button, Text, Title, Snackbar } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import { AuthContext } from '../../context/AuthContext';
 
-const SignUp = ({ navigation }) => {
+const SignUp = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [visible, setVisible] = useState(false);
+  const { login } = useContext(AuthContext);
+  const navigation = useNavigation();
 
-  const handleSignUp = () => {
-    // Implement your sign-up logic here
-    console.log('Sign up with:', name, email, password);
+  const handleSignUp = async () => {
+    if (!name || !email || !password) {
+      setError('All fields are required');
+    } else {
+      setError('');
+
+      try {
+        const response = await axios.post('http://192.168.0.215:5000/api/auth/signup', { name, email, password });
+        login(response.data);
+        setVisible(true);
+        setTimeout(() => navigation.navigate('SignIn'), 2000);
+      } catch (error) {
+        console.error('Error during signup:', error);
+        setError(`Network error: ${error.message}. Is the server running?`);
+      }
+    }
   };
 
   return (
@@ -37,12 +57,20 @@ const SignUp = ({ navigation }) => {
         style={styles.input}
         mode="outlined"
       />
+      {error ? <Text style={styles.error}>{error}</Text> : null}
       <Button mode="contained" onPress={handleSignUp} style={styles.button}>
         Sign Up
       </Button>
       <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
-      <Text style={styles.link}>Already have an account? Sign In</Text>
-    </TouchableOpacity>
+        <Text style={styles.link}>Already have an account? Sign In</Text>
+      </TouchableOpacity>
+      <Snackbar
+        visible={visible}
+        onDismiss={() => setVisible(false)}
+        duration={Snackbar.DURATION_SHORT}
+      >
+        Registration Successful!
+      </Snackbar>
     </View>
   );
 };
@@ -69,6 +97,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textAlign: 'center',
     color: '#1e88e5',
+  },
+  error: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 12,
   },
 });
 

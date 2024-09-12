@@ -1,14 +1,23 @@
-import React from 'react';
-import { TouchableOpacity, View, Text } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { Pressable, View, Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { CardStyleInterpolators } from '@react-navigation/stack';
 import ProductList from '../components/ProductList/ProductList';
 import { useImageStore } from "../store/ImageStore";
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import AuthStack from '../components/Auth/AuthStack';
 import Search from '../components/Auth/Search';
-import Cart from '../components/Cart/Cart'; // Import the Cart component
+import Cart from '../components/Cart/Cart';
+import Profile from '../components/Profile/Profile';
+import ChangePassword from '../components/Profile/ChangePassword';
+import MyOrders from '../components/Profile/MyOrders';
+import TermsAndConditions from '../components/Profile/TermsAndConditions';
+import PrivacyPolicy from '../components/Profile/PrivacyPolicy';
+import AboutUs from '../components/Profile/AboutUs';
+import ContactUs from '../components/Profile/ContactUs';
+import { AuthContext } from '../context/AuthContext';
+
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -23,19 +32,42 @@ const CartStack = () => (
   </Stack.Navigator>
 );
 
-export default function Navigation() {
+const ProfileStack = () => (
+  <Stack.Navigator
+    screenOptions={{
+      cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+      headerShown: false,
+    }}
+  >
+    <Stack.Screen name="ProfileScreen" component={Profile} />
+    <Stack.Screen name="ChangePassword" component={ChangePassword} />
+    <Stack.Screen name="MyOrders" component={MyOrders} />
+    <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
+    <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+    <Stack.Screen name="AboutUs" component={AboutUs} />
+    <Stack.Screen name="ContactUs" component={ContactUs} />
+  </Stack.Navigator>
+);
+
+const Navigation = () => {
   const { cart } = useImageStore();
+  const { logout } = useContext(AuthContext);
+  const [isPressed, setIsPressed] = useState(false);
 
   const cartQuantityCalculator = () => {
     return cart.reduce((total, item) => total + item.Quantity, 0);
   };
 
   const CartIcon = ({ navigation }) => (
-    <TouchableOpacity 
-      onPress={() => navigation.navigate('CartStack')} 
+    <Pressable 
+      onPress={() => {
+        setIsPressed(true);
+        navigation.navigate('Cart');
+        setTimeout(() => setIsPressed(false), 200); 
+      }} 
       style={{ marginRight: 15 }}
     >
-      <Ionicons name="cart-outline" size={24} color="black" />
+      <Ionicons name="cart-outline" size={24} color={isPressed ? 'purple' : 'black'} />
       {cartQuantityCalculator() > 0 && (
         <View style={{
           position: 'absolute',
@@ -53,13 +85,32 @@ export default function Navigation() {
           </Text>
         </View>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 
   return (
     <Tab.Navigator
-      screenOptions={({ navigation }) => ({
+      screenOptions={({ route, navigation }) => ({
+        tabBarIcon: ({ color, size, focused }) => {
+          let iconName;
+          color = focused ? 'purple' : color; 
+
+          if (route.name === 'Products') {
+            iconName = focused ? 'home' : 'home-outline';
+            return <Ionicons name={iconName} size={size} color={color} />;
+          } else if (route.name === 'Cart') {
+            iconName = focused ? 'shopping-cart' : 'shopping-cart';
+            return <MaterialIcons name={iconName} size={size} color={color} />;
+          } else if (route.name === 'Profile') {
+            iconName = focused ? 'user' : 'user-o';
+            return <FontAwesome name={iconName} size={size} color={color} />;
+          }
+        },
         tabBarShowLabel: true,
+        tabBarLabelStyle: {
+          color: 'black', 
+        },
+        tabBarActiveTintColor: 'purple', 
         tabBarStyle: {
           backgroundColor: 'white',
           borderTopWidth: 0,
@@ -77,69 +128,11 @@ export default function Navigation() {
         headerRight: () => <CartIcon navigation={navigation} />,
       })}
     >
-      {/* Home Screen */}
-      <Tab.Screen
-        name="Home"
-        component={ProductList}
-        options={{
-          tabBarLabel: "Home",
-          headerStyle: {
-            backgroundColor: '#D0D1BF',
-          },
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" color={color} size={size} />
-          ),
-        }}
-      />
-      
-      {/* Search Screen */}
-      <Tab.Screen
-        name="Search"
-        component={Search}
-        options={{
-          tabBarLabel: "Search",
-          headerStyle: {
-            backgroundColor: '#D0D1BF',
-          },
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="search-outline" color={color} size={size} />
-          ),
-        }}
-      />
-
-      {/* Likes Screen */}
-      <Tab.Screen
-        name="Likes"
-        component={ProductList} // Replace with your Likes component
-        options={{
-          tabBarLabel: "Likes",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="heart-outline" color={color} size={size} />
-          ),
-        }}
-      />
-
-      {/* Profile Screen */}
-      <Tab.Screen
-        name="Profile"
-        component={AuthStack}
-        options={{
-          tabBarLabel: "Profile",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" color={color} size={size} />
-          ),
-        }}
-      />
-
-      {/* Hidden Cart Stack */}
-      <Tab.Screen
-        name="CartStack"
-        component={CartStack}
-        options={{
-          tabBarButton: () => null,
-          tabBarVisible: false,
-        }}
-      />
+      <Tab.Screen name="Products" component={ProductList} />
+      <Tab.Screen name="Cart" component={CartStack} /> 
+      <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
   );
-}
+};
+
+export default Navigation;

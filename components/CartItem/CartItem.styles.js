@@ -1,113 +1,71 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-    contener:{
+    container: {
         justifyContent: 'center',
-        marginTop:10,
-        backgroundColor:'white',
-        width:'90%',
-        borderRadius:15
-
+        marginTop: 10,
+        backgroundColor: 'white',
+        width: '100%',
+        borderRadius: 15,
+        padding: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 3,
     },
-    cartLine:{
-        flexDirection:'row',
+    cartLine: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
-    cartDescription:{
-        flexDirection:'col',
-        marginLeft: 30,
-        marginVertical:10,
+    cartDescription: {
+        flexDirection: 'column',
+        marginLeft: 20,
+        marginVertical: 10,
+        flex: 1,
+    },
+    quantity: {
+        fontSize: 20,
+        color: '#333',
+        marginHorizontal: 10, 
+        fontWeight: 'bold', 
     },
     image: {
         height: 100,
         width: 100,
-        margin: 10,
-    },
-    imageModal:{
-        height: 250,
-        width: 250,
-    },
-    textModal:{
-        alignItems:'flex-end'
+        borderRadius: 10,
     },
     text: {
-        justifyContent : 'flex-start' ,
-        color:'green',
-        fontSize:20,
-        margin:10,
+        color: 'green',
+        fontSize: 18,
+        marginVertical: 5,
     },
-    button: {
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 5,
+    },
+    price: {
+        fontSize: 16,
+        color: '#333',
+        marginBottom: 5,
+    },
+    quantity: {
+        fontSize: 16,
+        color: '#333',
+        marginBottom: 10,
+    },
+    buttonOpacityContainer: {
+        flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#DDDDDD',
-        padding: 10,
-        margin:10,
-        width: 350,
     },
-    centeredView: {
-        flex: 1,
+    buttonOpacity: {
+        backgroundColor: '#DDDDDD',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 22,
-        height:'100%',
-        width:'100%',
-      },
-      modalView: {
-        margin: 20,
-        backgroundColor: 'white',
+        width: 40,
+        height: 40,
         borderRadius: 20,
-        padding: 35,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-        alignItems:'flex-start'
-      },
-      button: {
-        borderRadius: 20,
-        padding: 10,
-        elevation: 2,
-        marginTop:10,
-      },
-      buttonOpen: {
-        backgroundColor: '#F194FF',
-      },
-      buttonClose: {
-        backgroundColor: '#2196F3',
-      },
-      textStyle: {
-        color: 'white',
-        fontWeight: 'bold',
-        textAlign: 'center',
-      },
-      modalText: {
-        marginBottom: 15,
-        textAlign: 'center',
-      },
-      buttonModal:{
-        flexDirection:'col',
-        borderWidth: 1,
-        borderColor: 'red',
-      },
-      buttonOpacityContainer: {
-        flexDirection:'row',
-        alignItems: 'center',
-        padding: 10,
-        width:'50%',
-      },
-      buttonOpacity:{
-        backgroundColor: '#DDDDDD',
-        justifyContent:'center',
-        alignItems:'center',
-        width: 50,
-        height:50,
-        marginRight: 20,
-        marginLeft:0,
-      }
-
-
-  });
-  
+        marginHorizontal: 10,
+    },
+});
