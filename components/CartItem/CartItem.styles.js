@@ -6,7 +6,7 @@ export default StyleSheet.create({
         marginTop:10,
         backgroundColor:'white',
         width:'90%',
-        borderRadius:'15%'
+        borderRadius:15
 
     },
     cartLine:{

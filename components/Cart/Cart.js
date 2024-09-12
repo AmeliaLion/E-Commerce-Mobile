@@ -1,19 +1,52 @@
-import React from 'react';
-import { Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Text, View, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { useImageStore } from "../../store/ImageStore";
 import styles from '../Cart/Cart.styles';
 import CartItem from '../CartItem/CartItem';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { handlePayment } from '../../utils/payment'; // Import the handlePayment function
 
-export default function Cart({ navigation }) {
+export default function Cart() {
   const { cart } = useImageStore();
+  const navigation = useNavigation();
 
-  const handlePayment = () => {
-    navigation.navigate("Pay", { msg: "From Cart Screen", totalPrice });
+  // Mock user data (replace with actual user data from your store or context)
+  const user = {
+    firstName: "Sinovuyo",
+    lastName: "Sikhisi",
+    email: "sinovuyoshakes@gmail.com"
   };
 
   const totalItems = cart.reduce((sum, item) => sum + item.Quantity, 0);
   const totalPrice = cart.reduce((sum, item) => sum + item.Quantity * item.Price, 0).toFixed(2);
+
+  useEffect(() => {
+    const handleUrlChange = (event) => {
+      if (event.url.includes('return=http://store.example.com')) {
+        navigation.navigate('Cart');
+      }
+    };
+
+    const linkingListener = Linking.addEventListener('url', handleUrlChange);
+
+    return () => {
+      linkingListener.remove();
+    };
+  }, [navigation]);
+
+  const proceedToPayment = async () => {
+    try {
+      const paymentUrl = await handlePayment(cart, totalPrice, user);
+      if (paymentUrl) {
+        Linking.openURL(paymentUrl);
+      } else {
+        console.error('Failed to get payment URL');
+      }
+    } catch (error) {
+      console.error('Error initiating payment:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -39,10 +72,17 @@ export default function Cart({ navigation }) {
             </View>
             
             <TouchableOpacity
-              onPress={handlePayment}
+              onPress={proceedToPayment}
               style={styles.button}
             >
               <Text style={styles.buttonText}>Proceed to Payment (${totalPrice})</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => Linking.openURL('https://www.payfast.co.za/eng/recurring/update/00000000-0000-0000-0000-000000000000?return=http://store.example.com')}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>Update Card for Subscription</Text>
             </TouchableOpacity>
           </View>
         )}

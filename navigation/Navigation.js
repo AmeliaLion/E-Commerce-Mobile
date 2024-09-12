@@ -9,7 +9,6 @@ import { Ionicons } from '@expo/vector-icons';
 import AuthStack from '../components/Auth/AuthStack';
 import Search from '../components/Auth/Search';
 import Cart from '../components/Cart/Cart'; // Import the Cart component
-
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
